@@ -1,267 +1,146 @@
-# 🛒 E-Commerce Platform — GitOps on AWS EKS
+# 🚀 Terraform Capstone Project
 
-<div align="center">
+## 📖 Project Overview  
+The Terraform Capstone Project automates the deployment of AWS resources including EC2, S3, and DynamoDB. This project demonstrates practical use of Terraform to create a scalable architecture across multiple environments.
 
-![GitHub Actions](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white)
-![Argo CD](https://img.shields.io/badge/CD-Argo_CD-EF7B4D?style=for-the-badge&logo=argo&logoColor=white)
-![AWS EKS](https://img.shields.io/badge/Cloud-AWS_EKS-FF9900?style=for-the-badge&logo=amazon-aws&logoColor=white)
-![Terraform](https://img.shields.io/badge/IaC-Terraform-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)
-![Kubernetes](https://img.shields.io/badge/Orchestration-Kubernetes-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)
-![Docker](https://img.shields.io/badge/Container-Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![Next.js](https://img.shields.io/badge/App-Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)
-![Prometheus](https://img.shields.io/badge/Monitoring-Prometheus-E6522C?style=for-the-badge&logo=prometheus&logoColor=white)
-![Grafana](https://img.shields.io/badge/Observability-Grafana-F46800?style=for-the-badge&logo=grafana&logoColor=white)
+## 🏗️ Architecture  
+The architecture consists of various AWS services integrated to work seamlessly.
+- **EC2 Instances**: Used to run applications.
+- **S3 Buckets**: For storing application data and backup.
+- **DynamoDB**: NoSQL database for storing application state.
 
-**A production-grade, cloud-native e-commerce platform — engineered end-to-end with modern DevOps, GitOps, and Infrastructure-as-Code practices on AWS.**
-
-[Architecture](#-architecture) · [Tech Stack](#-tech-stack) · [CI/CD Pipeline](#-cicd-pipeline) · [Deployment](#-deployment) · [Monitoring](#-monitoring) · [Learnings](#-key-learnings)
-
-</div>
-
----
-
-## 📌 Project Overview
-
-This project is a **DevOps and Cloud Engineering showcase** built around a production-ready e-commerce web application. While the application frontend was adapted from an open-source codebase, the **entire cloud infrastructure, CI/CD pipeline, container orchestration, GitOps workflow, and observability stack** were designed and implemented from scratch.
-
-> **Core Focus:** Demonstrating real-world DevOps engineering — infrastructure provisioning, automated delivery pipelines, Kubernetes cluster management, and full-stack observability on AWS.
-
-### ✨ What Makes This Project Stand Out
-
-| Capability | Implementation |
-|---|---|
-| **Infrastructure as Code** | Entire AWS infrastructure provisioned with Terraform — repeatable, versioned, destroy-safe |
-| **Container Orchestration** | Kubernetes on AWS EKS with managed node groups, IAM roles, and autoscaling |
-| **CI Pipeline** | GitHub Actions — lint, build, Docker image push to ECR on every commit |
-| **GitOps CD** | Argo CD continuously syncs Kubernetes manifests from Git to EKS — Git is the single source of truth |
-| **Observability** | Prometheus scrapes cluster metrics; Grafana dashboards provide real-time visibility |
-| **Production Workflow** | Feature branches → PR → CI → image tag update → Argo CD auto-sync → EKS rollout |
-
----
-
-## 🏗 Architecture
-
+## 📂 Project Structure  
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                          Developer Workflow                              │
-│                                                                         │
-│   Developer → git push → GitHub → GitHub Actions CI → ECR (Docker)     │
-│                                         │                               │
-│                                   Manifest Repo ◄──── Image Tag Update  │
-│                                         │                               │
-│                                      Argo CD                            │
-│                                         │                               │
-│                              ┌──────────▼──────────┐                   │
-│                              │     AWS EKS Cluster  │                   │
-│                              │  ┌────────────────┐  │                   │
-│                              │  │   Deployment   │  │                   │
-│                              │  │  (Next.js App) │  │                   │
-│                              │  └───────┬────────┘  │                   │
-│                              │          │            │                   │
-│                              │  ┌───────▼────────┐  │                   │
-│                              │  │ Service / ALB  │  │                   │
-│                              │  └────────────────┘  │                   │
-│                              │                      │                   │
-│                              │  Prometheus + Grafana│                   │
-│                              └──────────────────────┘                   │
-│                                         │                               │
-│                              AWS: VPC · EKS · ECR · IAM · ALB          │
-└─────────────────────────────────────────────────────────────────────────┘
-```
+terraform-capstone/
+├── main.tf              # Main Terraform configuration
+├── variables.tf         # Input variables
+├── outputs.tf           # Outputs after deployment
+├── modules/             # Contains reusable modules
+│   ├── ec2/             # EC2 module
+│   ├── s3/              # S3 module
+│   └── dynamodb/        # DynamoDB module
+└── env/                # Environment specific configurations
+    ├── dev/
+    ├── stg/
+    └── prod/
+``` 
 
-### GitOps Flow Diagram
+## 🔧 Prerequisites  
+- AWS Account  
+- Terraform installed on your local machine  
+- AWS CLI configured  
 
-```mermaid
-flowchart TD
-    A[👨‍💻 Developer pushes code] --> B[GitHub Repository]
-    B --> C{GitHub Actions CI}
-    C --> D[🔍 Lint & Build]
-    D --> E[🐳 Docker Build]
-    E --> F[📦 Push to Amazon ECR]
-    F --> G[✏️ Update image tag in manifests repo]
-    G --> H[📁 Kubernetes Manifests Repo]
-    H --> I{Argo CD - Watches Repo}
-    I -->|Drift Detected| J[🔄 Auto-Sync to EKS]
-    J --> K[☸️ AWS EKS Cluster]
-    K --> L[🚀 Rolling Deployment]
-    L --> M[✅ App Live]
-    K --> N[📊 Prometheus Scrapes Metrics]
-    N --> O[📈 Grafana Dashboards]
-```
+## 🏁 Getting Started Guide  
+### Step-by-Step Instructions  
+1. Clone the repository:  
+   ```bash  
+   git clone https://github.com/Harsh7209/terraform-capstone.git  
+   ```  
+2. Navigate to the project directory:  
+   ```bash  
+   cd terraform-capstone  
+   ```  
+3. Initialize Terraform:  
+   ```bash  
+   terraform init  
+   ```  
+4. Plan your deployment:  
+   ```bash  
+   terraform plan  
+   ```  
+5. Apply the changes:  
+   ```bash  
+   terraform apply  
+   ```  
 
----
+## 🌍 Environment Configuration  
+| Environment | EC2 Instance Type | S3 Bucket Name      | DynamoDB Table Name |  
+|-------------|-------------------|----------------------|----------------------|  
+| Dev         | t2.micro          | dev-bucket           | dev-table            |  
+| Staging     | t2.medium         | stg-bucket           | stg-table            |  
+| Production   | t2.large          | prod-bucket          | prod-table           |  
 
-## 🧰 Tech Stack
+## 🔧 Troubleshooting
+# Issue: "Provider AWS not found"
+Solution: Run terraform init to download the AWS provider.
 
-### Application Layer
-| Technology | Purpose |
-|---|---|
-| **Next.js** | Full-stack React framework — SSR + API routes |
-| **React** | Component-based UI |
-| **Node.js** | Runtime environment |
+# Issue: "Invalid provider version"
+Solution: Update AWS provider version in terraform.tf or run:
 
-### DevOps & Infrastructure Layer
-| Technology | Purpose |
-|---|---|
-| **Docker** | Application containerization |
-| **Kubernetes (K8s)** | Container orchestration |
-| **AWS EKS** | Managed Kubernetes control plane |
-| **AWS ECR** | Private Docker image registry |
-| **AWS VPC / ALB / IAM** | Networking, load balancing, and access control |
-| **Terraform** | Infrastructure as Code — provision all AWS resources |
-| **GitHub Actions** | CI pipeline — build, test, push |
-| **Argo CD** | GitOps-based Continuous Delivery |
-| **Prometheus** | Metrics collection and alerting |
-| **Grafana** | Visualization and dashboards |
+# Bash
+terraform init -upgrade 
 
----
+Issue: "Workspace does not exist" 
 
-## 📁 Project Structure
+Solution: Create the workspace first:
 
-```
-ecommerce-gitops-eks/
-│
-├── app/                          # Next.js application source
-│   ├── components/               # React components
-│   ├── pages/                    # Next.js pages & API routes
-│   ├── public/                   # Static assets
-│   └── styles/                   # Global styles
-│
-├── Dockerfile                    # Production-optimized multi-stage build
-├── .dockerignore
-│
-├── terraform/                    # Infrastructure as Code
-│   ├── main.tf                   # Root module
-│   ├── variables.tf              # Input variables
-│   ├── outputs.tf                # Output values
-│   ├── vpc.tf                    # VPC, subnets, IGW, route tables
-│   ├── eks.tf                    # EKS cluster + managed node groups
-│   ├── iam.tf                    # IAM roles and policies
-│   └── ecr.tf                    # ECR repository
-│
-├── k8s/                          # Kubernetes manifests
-│   ├── deployment.yaml           # App Deployment with resource limits
-│   ├── service.yaml              # LoadBalancer / ALB service
-│   ├── ingress.yaml              # Ingress rules
-│   ├── configmap.yaml            # Environment configuration
-│   └── namespace.yaml            # Namespace definition
-│
-├── argocd/                       # Argo CD Application manifests
-│   └── application.yaml          # Argo CD Application CRD
-│
-├── monitoring/                   # Observability stack
-│   ├── prometheus-values.yaml    # Helm values for kube-prometheus-stack
-│   └── grafana-dashboard.json    # Custom Grafana dashboard export
-│
-└── .github/
-    └── workflows/
-        └── ci.yaml               # GitHub Actions CI pipeline
-```
+# Bash
+terraform workspace new <workspace-name> 
 
----
+Issue: "Insufficient permissions" 
 
-## ⚙️ CI/CD Pipeline
+Solution: Verify AWS credentials:  
 
-### Continuous Integration — GitHub Actions
+# Bash
+aws sts get-caller-identity 
 
-Every push to `main` or a pull request triggers the CI pipeline:
+Ensure your IAM user has EC2, S3, and DynamoDB permissions.
 
-```yaml
-# .github/workflows/ci.yaml (summary)
+# Issue: "Resource already exists"
+Solution: Check AWS Console for existing resources 
 
-Pipeline Stages:
-  1. Checkout code
-  2. Set up Node.js environment
-  3. Install dependencies & run linter
-  4. Build Next.js application
-  5. Build Docker image (multi-stage, production-optimized)
-  6. Authenticate to Amazon ECR
-  7. Push image with commit SHA tag → ECR
-  8. Update image tag in Kubernetes manifests repo (triggers Argo CD)
-```
-
-```
-[Code Push] → [Lint] → [Build] → [Docker Build] → [ECR Push] → [Manifest Update]
-```
-
-### Continuous Delivery — Argo CD (GitOps)
-
-Argo CD is deployed inside the EKS cluster and continuously watches the Kubernetes manifests repository.
+# Bash
+terraform destroy
+terraform apply
+Issue: "Invalid SSH key"
+Solution: Update the public key in modules/ec2/main.tf
 
 
 
-**Key GitOps Principles Applied:**
-- ✅ Git as the single source of truth for cluster state
-- ✅ Declarative configuration — no imperative `kubectl apply` in production
-- ✅ Automated sync with self-healing — drift detection and auto-correction
-- ✅ Full audit trail through Git history
+## ✨ Key Features
 
----
+# 1. Multi-Environment Support
+Dev, Staging, and Production environments
+Independent state per environment using workspaces
+Automatic scaling based on environment
+
+# 2. Modular Design
+Reusable EC2, S3, and DynamoDB modules
+Each module is self-contained with its own variables
+Easy to add new modules
+
+# 3. Scalability
+Use count parameter for dynamic resource creation
+Simple variable adjustment for resource scaling
+Supports adding new environments easily
+ # 4. Security
+Security group with SSH, HTTP, and HTTPS access
+Key pair for secure EC2 access
+DynamoDB with PAY_PER_REQUEST billing (no unused capacity)
+ # 5. Naming Convention
+Environment-based resource naming (e.g., dev-terra-server-1)
+Consistent tagging across all resources
+Easy resource identification in AWS Console
+# 6. Cost Optimization
+t3.micro instances (cost-effective)
+Configurable resource counts per environment
+DynamoDB PAY_PER_REQUEST billing
 
 
-## 📊 Monitoring & Observability
-
-The platform ships with a production-grade observability stack:
-
-### Prometheus
-- Deployed via the `kube-prometheus-stack` Helm chart
-- Scrapes metrics from EKS nodes, pods, and the Next.js application
-- Alerting rules configured for pod restarts, high CPU/memory, and deployment failures
-
-### Grafana
-- Pre-configured dashboards for:
-  - **Cluster Overview** — node CPU, memory, pod health
-  - **Deployment Health** — rollout status, replica availability
-  - **Application Metrics** — request latency, error rates (if instrumented)
-
-
-### Key Metrics Tracked
-
-| Metric | Alert Threshold |
-|---|---|
-| Pod CPU Usage | > 80% for 5m |
-| Pod Memory Usage | > 85% for 5m |
-| Pod Restarts | > 3 in 10m |
-| Node Not Ready | Immediate |
-| Deployment Unavailable | Immediate |
-
----
-
-## 🔑 Key Learnings
-
-Working through this project delivered deep, hands-on experience with:
-
-- **GitOps mental model** — understanding why Git-as-source-of-truth eliminates configuration drift and improves reliability
-- **Argo CD internals** — Application CRDs, sync policies, self-healing, resource health checks
-- **Terraform at scale** — module structure, remote state management, dependency graphs, and AWS provider nuances
-- **EKS cluster management** — IAM roles for service accounts (IRSA), managed node group lifecycle, VPC CNI plugin behavior
-- **Docker multi-stage builds** — significantly reducing final image size for production
-- **Kubernetes resource design** — defining proper resource requests/limits, liveness/readiness probes, and rolling update strategies
-- **Observability-first thinking** — instrumenting infrastructure before problems occur, not after
+## 🥇 Best Practices  
+- Use version control for your Terraform scripts.  
+- Regularly update your modules to include security patches.  
 
 
 
-## 👨‍💻 Author
+## 🚀 Future Enhancements  
+- Integration with CI/CD pipelines  
+- Add more AWS services like RDS and Lambda  
 
-<div align="center">
+## 👤 Author Information  
+- **Name**: Harsh  
+- **GitHub**: [Harsh7209](https://github.com/Harsh7209)  
+- **Email**: harshchoubey113@example.com  
 
-**[Harsh Choubey]**
-
-*DevOps & Cloud Engineer*
-
-
-
-*Passionate about building scalable, automated, and observable cloud-native systems.*
-*Open to DevOps, Cloud, and Platform Engineering roles.*
-
-</div>
-
----
-
-<div align="center">
-
-**⭐ If this project helped or inspired you, consider starring the repo!**
-
-*Built with 🛠️ infrastructure, ☁️ cloud, and a strong GitOps mindset.*
-
-</div>
+---  
+This README is intended to provide all necessary information for deploying and using the resources configured through the Terraform Capstone project effectively.
