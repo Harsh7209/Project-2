@@ -1,3 +1,4 @@
+# Certificate generator file 
 kind: ClusterIssuer
 apiVersion: cert-manager.io/v1
 
