@@ -1,3 +1,4 @@
+# Workflow used to create the namesapace
 apiVersion: v1
 kind: Namespace
 metadata:
