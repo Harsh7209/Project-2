@@ -1,259 +1,267 @@
-# 🐳 Docker Troubleshooter Agent
+# 🛒 E-Commerce Platform — GitOps on AWS EKS
 
 <div align="center">
 
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![LangChain](https://img.shields.io/badge/LangChain-1C3C3C?style=for-the-badge&logo=langchain&logoColor=white)
-![Ollama](https://img.shields.io/badge/Ollama-Local_LLM-black?style=for-the-badge)
-![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+![GitHub Actions](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white)
+![Argo CD](https://img.shields.io/badge/CD-Argo_CD-EF7B4D?style=for-the-badge&logo=argo&logoColor=white)
+![AWS EKS](https://img.shields.io/badge/Cloud-AWS_EKS-FF9900?style=for-the-badge&logo=amazon-aws&logoColor=white)
+![Terraform](https://img.shields.io/badge/IaC-Terraform-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)
+![Kubernetes](https://img.shields.io/badge/Orchestration-Kubernetes-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)
+![Docker](https://img.shields.io/badge/Container-Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Next.js](https://img.shields.io/badge/App-Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)
+![Prometheus](https://img.shields.io/badge/Monitoring-Prometheus-E6522C?style=for-the-badge&logo=prometheus&logoColor=white)
+![Grafana](https://img.shields.io/badge/Observability-Grafana-F46800?style=for-the-badge&logo=grafana&logoColor=white)
 
-**An autonomous AI agent that diagnoses and reasons about Docker container issues — powered by a local LLM, zero cloud dependencies.**
+**A production-grade, cloud-native e-commerce platform — engineered end-to-end with modern DevOps, GitOps, and Infrastructure-as-Code practices on AWS.**
 
-[Features](#-features) · [Architecture](#-architecture) · [Installation](#-installation) · [Usage](#-usage) · [How It Works](#-how-it-works) · [Contributing](#-contributing)
+[Architecture](#-architecture) · [Tech Stack](#-tech-stack) · [CI/CD Pipeline](#-cicd-pipeline) · [Deployment](#-deployment) · [Monitoring](#-monitoring) · [Learnings](#-key-learnings)
 
 </div>
 
 ---
 
-## 🧠 What Is This?
+## 📌 Project Overview
 
-Docker Troubleshooter Agent is a **ReAct-based AI agent** that autonomously investigates your Docker environment. You ask a question in plain English — the agent decides which tools to call, interprets the results, reasons through the problem, and delivers a diagnosis.
+This project is a **DevOps and Cloud Engineering showcase** built around a production-ready e-commerce web application. While the application frontend was adapted from an open-source codebase, the **entire cloud infrastructure, CI/CD pipeline, container orchestration, GitOps workflow, and observability stack** were designed and implemented from scratch.
 
-No more copy-pasting `docker ps -a` output into ChatGPT. The agent *does the digging itself.*
+> **Core Focus:** Demonstrating real-world DevOps engineering — infrastructure provisioning, automated delivery pipelines, Kubernetes cluster management, and full-stack observability on AWS.
 
-```
-> Why is my postgres container restarting?
+### ✨ What Makes This Project Stand Out
 
-Thinking...
-
-I'll start by listing all containers to find the postgres container...
-[Calls: list_containers]
-
-Found container 'postgres' with status 'Restarting (1) 3 seconds ago'.
-Now I'll pull the logs to understand the crash reason...
-[Calls: get_logs(postgres)]
-
-The logs reveal: "FATAL: data directory /var/lib/postgresql/data has wrong ownership"
-This is a volume permission issue. Here's how to fix it...
-```
-
----
-
-## ✨ Features
-
-| Feature | Details |
+| Capability | Implementation |
 |---|---|
-| 🤖 **Autonomous reasoning** | Uses the ReAct loop — Reason → Act → Observe — to iteratively diagnose issues without hand-holding |
-| 🔒 **Fully local** | Runs on [Ollama](https://ollama.com) with `gemma4` — your container data never leaves your machine |
-| 🛠️ **Built-in Docker tools** | Lists containers, fetches logs, and deep-inspects container configs in one agent |
-| 💬 **Natural language interface** | Ask questions the way you'd ask a senior DevOps engineer |
-| 🔌 **Extensible** | Add new tools (e.g., `docker stats`, `docker network inspect`) in minutes |
-| ⚡ **Lightweight** | Pure Python, minimal dependencies, no infrastructure to manage |
+| **Infrastructure as Code** | Entire AWS infrastructure provisioned with Terraform — repeatable, versioned, destroy-safe |
+| **Container Orchestration** | Kubernetes on AWS EKS with managed node groups, IAM roles, and autoscaling |
+| **CI Pipeline** | GitHub Actions — lint, build, Docker image push to ECR on every commit |
+| **GitOps CD** | Argo CD continuously syncs Kubernetes manifests from Git to EKS — Git is the single source of truth |
+| **Observability** | Prometheus scrapes cluster metrics; Grafana dashboards provide real-time visibility |
+| **Production Workflow** | Feature branches → PR → CI → image tag update → Argo CD auto-sync → EKS rollout |
 
 ---
 
-## 🏗️ Architecture
+## 🏗 Architecture
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    User (CLI Input)                      │
-└───────────────────────┬─────────────────────────────────┘
-                        │ natural language question
-                        ▼
-┌─────────────────────────────────────────────────────────┐
-│              LangChain ReAct Agent                       │
-│                                                          │
-│   ┌──────────────────────────────────────────────────┐  │
-│   │              ChatOllama (gemma4)                  │  │
-│   │         Reason → Plan → Decide tool               │  │
-│   └───────────┬──────────────────────────────────────┘  │
-│               │                                          │
-│   ┌───────────▼──────────────────────────────────────┐  │
-│   │              Tool Dispatcher                      │  │
-│   └───┬───────────────┬──────────────────┬───────────┘  │
-│       │               │                  │               │
-│  ┌────▼────┐   ┌──────▼──────┐   ┌──────▼──────┐        │
-│  │  list_  │   │  get_logs   │   │  inspect_   │        │
-│  │containe-│   │(container)  │   │  container  │        │
-│  │  rs()   │   │             │   │             │        │
-│  └────┬────┘   └──────┬──────┘   └──────┬──────┘        │
-└───────┼───────────────┼─────────────────┼───────────────┘
-        │               │                 │
-        ▼               ▼                 ▼
-┌───────────────────────────────────────────────────────┐
-│                  Docker Engine (CLI)                   │
-│       docker ps -a  /  docker logs  /  docker inspect │
-└───────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          Developer Workflow                              │
+│                                                                         │
+│   Developer → git push → GitHub → GitHub Actions CI → ECR (Docker)     │
+│                                         │                               │
+│                                   Manifest Repo ◄──── Image Tag Update  │
+│                                         │                               │
+│                                      Argo CD                            │
+│                                         │                               │
+│                              ┌──────────▼──────────┐                   │
+│                              │     AWS EKS Cluster  │                   │
+│                              │  ┌────────────────┐  │                   │
+│                              │  │   Deployment   │  │                   │
+│                              │  │  (Next.js App) │  │                   │
+│                              │  └───────┬────────┘  │                   │
+│                              │          │            │                   │
+│                              │  ┌───────▼────────┐  │                   │
+│                              │  │ Service / ALB  │  │                   │
+│                              │  └────────────────┘  │                   │
+│                              │                      │                   │
+│                              │  Prometheus + Grafana│                   │
+│                              └──────────────────────┘                   │
+│                                         │                               │
+│                              AWS: VPC · EKS · ECR · IAM · ALB          │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
-The agent follows the **ReAct (Reasoning + Acting)** paradigm:
-1. **Reason** — The LLM thinks about what information it needs
-2. **Act** — It calls the appropriate Docker tool
-3. **Observe** — It reads the tool output
-4. **Repeat** — Until it has enough context to answer
-5. **Respond** — Delivers a final, grounded diagnosis
+### GitOps Flow Diagram
 
----
-
-## 📦 Prerequisites
-
-Before you begin, make sure you have the following installed:
-
-- **Python 3.11+**
-- **Docker** — running and accessible via CLI
-- **Ollama** — for running the local LLM
-
-```bash
-# Verify Docker is running
-docker ps
-
-# Verify Ollama is installed
-ollama --version
+```mermaid
+flowchart TD
+    A[👨‍💻 Developer pushes code] --> B[GitHub Repository]
+    B --> C{GitHub Actions CI}
+    C --> D[🔍 Lint & Build]
+    D --> E[🐳 Docker Build]
+    E --> F[📦 Push to Amazon ECR]
+    F --> G[✏️ Update image tag in manifests repo]
+    G --> H[📁 Kubernetes Manifests Repo]
+    H --> I{Argo CD - Watches Repo}
+    I -->|Drift Detected| J[🔄 Auto-Sync to EKS]
+    J --> K[☸️ AWS EKS Cluster]
+    K --> L[🚀 Rolling Deployment]
+    L --> M[✅ App Live]
+    K --> N[📊 Prometheus Scrapes Metrics]
+    N --> O[📈 Grafana Dashboards]
 ```
 
 ---
 
-## 🚀 Installation
+## 🧰 Tech Stack
 
-### 1. Clone the repository
+### Application Layer
+| Technology | Purpose |
+|---|---|
+| **Next.js** | Full-stack React framework — SSR + API routes |
+| **React** | Component-based UI |
+| **Node.js** | Runtime environment |
 
-```bash
-git clone https://github.com/your-username/docker-troubleshooter-agent.git
-cd docker-troubleshooter-agent
-```
-
-### 2. Create a virtual environment
-
-```bash
-python3 -m venv venv
-source venv/bin/activate        # macOS/Linux
-# .\venv\Scripts\activate       # Windows
-```
-
-### 3. Install dependencies
-
-```bash
-pip install langchain langchain-ollama
-```
-
-Or, if a `requirements.txt` is present:
-
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Pull the LLM model via Ollama
-
-```bash
-ollama pull gemma4
-```
-
-> 💡 This downloads the `gemma4` model locally (~5GB). It only needs to happen once.
+### DevOps & Infrastructure Layer
+| Technology | Purpose |
+|---|---|
+| **Docker** | Application containerization |
+| **Kubernetes (K8s)** | Container orchestration |
+| **AWS EKS** | Managed Kubernetes control plane |
+| **AWS ECR** | Private Docker image registry |
+| **AWS VPC / ALB / IAM** | Networking, load balancing, and access control |
+| **Terraform** | Infrastructure as Code — provision all AWS resources |
+| **GitHub Actions** | CI pipeline — build, test, push |
+| **Argo CD** | GitOps-based Continuous Delivery |
+| **Prometheus** | Metrics collection and alerting |
+| **Grafana** | Visualization and dashboards |
 
 ---
 
-## ▶️ Usage
-
-```bash
-python3 module-2/agent.py
-```
-
-You'll see the interactive prompt:
+## 📁 Project Structure
 
 ```
-Docker Troubleshooter Agent
-------------------------------
-Ask me about your Docker containers. Type 'quit' to exit.
-
->
-```
-
-### Example queries you can try
-
-```bash
-# Container health
-> Which containers are currently stopped?
-> Are any containers in a restart loop?
-
-# Log analysis
-> What errors are in the nginx container logs?
-> Why did my redis container crash?
-
-# Deep inspection
-> What port is my postgres container exposed on?
-> What environment variables is the api container using?
-> Is my web container attached to a custom network?
-
-# General diagnosis
-> Something is wrong with my app container. Can you investigate?
-> Which container is most likely causing issues right now?
-```
-
-Type `quit`, `exit`, or `q` to exit the agent.
-
----
-
-## 🔧 Available Tools
-
-The agent has access to three core Docker tools:
-
-### `list_containers()`
-Runs `docker ps -a` to get a full picture of all containers — their names, status, image, and ports.
-
-### `get_logs(container_name)`
-Fetches the last 50 lines from a container's stdout/stderr — the agent uses this to spot crashes, errors, or misconfigurations.
-
-### `inspect_container(container_name)`
-Runs `docker inspect` to retrieve the full container metadata — network config, environment variables, volume mounts, restart policies, and more.
-
----
-
-## 🔄 Switching the LLM
-
-The agent uses `gemma4` by default, but you can swap in any model supported by Ollama:
-
-```python
-# In agent.py
-llm = ChatOllama(model="llama3.2", temperature=0)   # Meta Llama 3.2
-llm = ChatOllama(model="mistral", temperature=0)     # Mistral 7B
-llm = ChatOllama(model="qwen2.5", temperature=0)     # Qwen 2.5
-```
-
-> 💡 For best results, use models with strong instruction-following and tool-use capabilities. `temperature=0` keeps the agent deterministic and focused.
-
----
-
-## 🗂️ Project Structure
-
-```
-docker-troubleshooter-agent/
+ecommerce-gitops-eks/
 │
-├── module-2/
-│   └── agent.py          # Main agent — tools, LLM setup, ReAct loop
+├── app/                          # Next.js application source
+│   ├── components/               # React components
+│   ├── pages/                    # Next.js pages & API routes
+│   ├── public/                   # Static assets
+│   └── styles/                   # Global styles
 │
-├── requirements.txt      # Python dependencies
-└── README.md             # You're reading it
+├── Dockerfile                    # Production-optimized multi-stage build
+├── .dockerignore
+│
+├── terraform/                    # Infrastructure as Code
+│   ├── main.tf                   # Root module
+│   ├── variables.tf              # Input variables
+│   ├── outputs.tf                # Output values
+│   ├── vpc.tf                    # VPC, subnets, IGW, route tables
+│   ├── eks.tf                    # EKS cluster + managed node groups
+│   ├── iam.tf                    # IAM roles and policies
+│   └── ecr.tf                    # ECR repository
+│
+├── k8s/                          # Kubernetes manifests
+│   ├── deployment.yaml           # App Deployment with resource limits
+│   ├── service.yaml              # LoadBalancer / ALB service
+│   ├── ingress.yaml              # Ingress rules
+│   ├── configmap.yaml            # Environment configuration
+│   └── namespace.yaml            # Namespace definition
+│
+├── argocd/                       # Argo CD Application manifests
+│   └── application.yaml          # Argo CD Application CRD
+│
+├── monitoring/                   # Observability stack
+│   ├── prometheus-values.yaml    # Helm values for kube-prometheus-stack
+│   └── grafana-dashboard.json    # Custom Grafana dashboard export
+│
+└── .github/
+    └── workflows/
+        └── ci.yaml               # GitHub Actions CI pipeline
 ```
 
 ---
 
-## 🛣️ Roadmap
+## ⚙️ CI/CD Pipeline
 
-- [ ] Add `docker stats` tool for real-time resource monitoring
-- [ ] Add `docker network inspect` for network topology diagnosis
-- [ ] Support multi-container issue correlation (e.g., service mesh problems)
-- [ ] Add a `fix_container` tool with safe remediation actions
-- [ ] Web UI frontend (Streamlit or Gradio)
-- [ ] Support for Docker Compose projects (`docker compose ps`, `docker compose logs`)
-- [ ] OpenAI / Anthropic model support as a fallback option
+### Continuous Integration — GitHub Actions
+
+Every push to `main` or a pull request triggers the CI pipeline:
+
+```yaml
+# .github/workflows/ci.yaml (summary)
+
+Pipeline Stages:
+  1. Checkout code
+  2. Set up Node.js environment
+  3. Install dependencies & run linter
+  4. Build Next.js application
+  5. Build Docker image (multi-stage, production-optimized)
+  6. Authenticate to Amazon ECR
+  7. Push image with commit SHA tag → ECR
+  8. Update image tag in Kubernetes manifests repo (triggers Argo CD)
+```
+
+```
+[Code Push] → [Lint] → [Build] → [Docker Build] → [ECR Push] → [Manifest Update]
+```
+
+### Continuous Delivery — Argo CD (GitOps)
+
+Argo CD is deployed inside the EKS cluster and continuously watches the Kubernetes manifests repository.
+
+
+
+**Key GitOps Principles Applied:**
+- ✅ Git as the single source of truth for cluster state
+- ✅ Declarative configuration — no imperative `kubectl apply` in production
+- ✅ Automated sync with self-healing — drift detection and auto-correction
+- ✅ Full audit trail through Git history
+
+---
+
+
+## 📊 Monitoring & Observability
+
+The platform ships with a production-grade observability stack:
+
+### Prometheus
+- Deployed via the `kube-prometheus-stack` Helm chart
+- Scrapes metrics from EKS nodes, pods, and the Next.js application
+- Alerting rules configured for pod restarts, high CPU/memory, and deployment failures
+
+### Grafana
+- Pre-configured dashboards for:
+  - **Cluster Overview** — node CPU, memory, pod health
+  - **Deployment Health** — rollout status, replica availability
+  - **Application Metrics** — request latency, error rates (if instrumented)
+
+
+### Key Metrics Tracked
+
+| Metric | Alert Threshold |
+|---|---|
+| Pod CPU Usage | > 80% for 5m |
+| Pod Memory Usage | > 85% for 5m |
+| Pod Restarts | > 3 in 10m |
+| Node Not Ready | Immediate |
+| Deployment Unavailable | Immediate |
+
+---
+
+## 🔑 Key Learnings
+
+Working through this project delivered deep, hands-on experience with:
+
+- **GitOps mental model** — understanding why Git-as-source-of-truth eliminates configuration drift and improves reliability
+- **Argo CD internals** — Application CRDs, sync policies, self-healing, resource health checks
+- **Terraform at scale** — module structure, remote state management, dependency graphs, and AWS provider nuances
+- **EKS cluster management** — IAM roles for service accounts (IRSA), managed node group lifecycle, VPC CNI plugin behavior
+- **Docker multi-stage builds** — significantly reducing final image size for production
+- **Kubernetes resource design** — defining proper resource requests/limits, liveness/readiness probes, and rolling update strategies
+- **Observability-first thinking** — instrumenting infrastructure before problems occur, not after
+
+
+
+## 👨‍💻 Author
+
+<div align="center">
+
+**[Harsh Choubey]**
+
+*DevOps & Cloud Engineer*
+
+
+
+*Passionate about building scalable, automated, and observable cloud-native systems.*
+*Open to DevOps, Cloud, and Platform Engineering roles.*
+
+</div>
 
 ---
 
 <div align="center">
 
-Built with 🐳 Docker · 🦜 LangChain · 🦙 Ollama
+**⭐ If this project helped or inspired you, consider starring the repo!**
 
-*If this saved you a debugging session, give it a ⭐*
+*Built with 🛠️ infrastructure, ☁️ cloud, and a strong GitOps mindset.*
 
 </div>
